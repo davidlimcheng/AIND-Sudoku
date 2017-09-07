@@ -2,5 +2,7 @@
 __pycache__
 *.pyc
 
-sudoku-[0-9]*.zip
-sudoku-result-[0-9]*.json
+# Pycharm IDE Files #
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
