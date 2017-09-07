@@ -17,6 +17,21 @@ units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
 
+def display(values):
+    """
+    Display the values as a 2-D grid.
+    Args:
+        values(dict): The sudoku in dictionary form
+    """
+    width = 1+max(len(values[s]) for s in boxes)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols))
+        if r in 'CF': print(line)
+    return
+
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -41,8 +56,34 @@ def naked_twins(values):
         the values dictionary with the naked twins eliminated from peers.
     """
 
-    # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    for unit in unitlist:
+        unit_values = [value for value in [values[box] for box in unit]]
+        unit_dict = {box: value for (box, value) in zip([box for box in unit], unit_values)}
+
+        # Find all possible twin instances in unit
+        lengthened_dict = dict([(box, value) for box, value in unit_dict.items() if len(value) == 2])
+
+        if len(lengthened_dict) >= 2:
+            twin_candidate_values = [value for value in lengthened_dict.values()]
+            # Use set() to extract all unique twins occurring in candidates
+            twin_values = set([value for value in twin_candidate_values if twin_candidate_values.count(value) >= 2])
+            twins = {box: value for (box, value) in lengthened_dict.items() if value in twin_values}
+
+            # Eliminate the naked twins as possibilities for their peers
+            if len(twins) >= 2:
+                for value in twin_values:
+                    inverted_twins = {value: [box for box, val in twins.items() if value == val]}
+                for values_to_replace, boxes in inverted_twins.items():
+                    for box, value in unit_dict.items():
+                        if len(value) >= 2:
+                            for v in values_to_replace:
+                                if box not in boxes:
+                                    unit_dict[box] = unit_dict[box].replace(v, '')
+
+                # Replace the values in input dictionary with values in unit_dict
+                for box, value in unit_dict.items():
+                    values[box] = value
+    return values
 
 
 def grid_values(grid):
@@ -65,19 +106,6 @@ def grid_values(grid):
     assert len(chars) == 81
     return dict(zip(boxes, chars))
 
-def display(values):
-    """
-    Display the values as a 2-D grid.
-    Args:
-        values(dict): The sudoku in dictionary form
-    """
-    width = 1+max(len(values[s]) for s in boxes)
-    line = '+'.join(['-'*(width*3)]*3)
-    for r in rows:
-        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
-                      for c in cols))
-        if r in 'CF': print(line)
-    return
 
 def eliminate(values):
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
