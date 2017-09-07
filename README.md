@@ -3,11 +3,15 @@
 
 # Question 1 (Naked Twins)
 Q: How do we use constraint propagation to solve the naked twins problem?  
-A: *Student should provide answer here*
-
+A: We use constraint propagation by first reducing the search space to within a single unit, and forcing the removal of any number within that unit's boxes
+   that appears as twins elsewhere in the unit. Applying this constraint for every possible unit brings us closer to the solution by removing possibilities
+   on the board.
+ 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: We use constraint propagation recursively to solve the diagonal sudoku problem. We first reduce the search space by applying eliminate() and only_choice() constraints.  We
+   then create child sudoku puzzles from the reduced board, recursively applying both constraints once again, and creating more child sudokus if necessary.  This is done until
+   we arrive at a board which isn't solvable (in which case, we move on to the next case), or we get a solved board.
 
 ### Install
 
